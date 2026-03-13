@@ -1,0 +1,12 @@
+human-success-agent-clean/
+├── render.yaml
+├── backend/
+│   ├── requirements.txt
+│   ├── agent.py
+│   ├── app.py
+│   ├── .env
+│   └── Dockerfile
+└── frontend/
+    ├── index.html
+    ├── style.css
+    └── script.js

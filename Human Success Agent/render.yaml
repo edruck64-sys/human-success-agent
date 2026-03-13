@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: human-success-backend
+    env: docker
+    repo: https://github.com/edruck64-sys/human-success-agent
+    branch: main
+    dockerfilePath: ./backend/Dockerfile
+    envVars:
+      - key: DEEPSEEK_API_KEY
+        sync: false
+    plan: free
+
+  - type: web
+    name: human-success-frontend
+    env: static
+    repo: https://github.com/edruck64-sys/human-success-agent
+    branch: main
+    staticPublishPath: ./frontend
+    plan: free
