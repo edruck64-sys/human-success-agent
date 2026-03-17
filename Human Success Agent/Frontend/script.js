@@ -212,7 +212,7 @@ function updatePhaseUI() {
 newJourneyBtn.addEventListener('click', async () => {
     if (confirm('Start a new journey? This will clear your conversation history.')) {
         try {
-            await fetch(`http://localhost:8000/user/${userId}`, {
+            const API_URL = 'https://human-success-backend-1.onrender.com';
                 method: 'DELETE'
             });
         } catch (error) {
