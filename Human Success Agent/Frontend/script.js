@@ -272,8 +272,7 @@ newJourneyBtn.addEventListener('click', async () => {
         
         evidenceList.innerHTML = '<p class="empty-evidence">Your evidence will appear here</p>';
         updatePhaseUI();
-    }
-});
+    
 
 // Generate session ID
 function generateSessionId() {
