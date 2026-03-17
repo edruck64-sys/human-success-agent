@@ -211,13 +211,14 @@ function updatePhaseUI() {
 // New journey
 newJourneyBtn.addEventListener('click', async () => {
     if (confirm('Start a new journey? This will clear your conversation history.')) {
-        try {
-            const API_URL = 'https://human-success-backend-1.onrender.com';
-                method: 'DELETE'
-            });
-        } catch (error) {
-            console.error('Error clearing user data:', error);
-        }
+       try {
+    const API_URL = 'https://human-success-backend-1.onrender.com';
+    await fetch(`${API_URL}/user/${userId}`, {
+        method: 'DELETE'
+    });
+} catch (error) {
+    console.error('Error clearing user data:', error);
+}
         
         // Reset local state
         userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
