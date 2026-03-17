@@ -4,6 +4,8 @@ let sessionId = localStorage.getItem('human_success_session_id') || generateSess
 let messageCount = parseInt(localStorage.getItem('message_count') || '0');
 let phase = localStorage.getItem('current_phase') || 'safety';
 let isProcessing = false;
+// API URL - CHANGE THIS TO YOUR BACKEND URL
+const API_URL = 'https://human-success-backend-1.onrender.com';
 
 // Generate IDs if needed
 if (!userId) {
@@ -78,7 +80,7 @@ async function sendMessage() {
     typingIndicator.style.display = 'flex';
     
     try {
-        const response = await fetch('http://localhost:8000/chat', {
+        const response = await fetch(`${API_URL}/chat`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -151,7 +153,7 @@ function addMessageToChat(role, content, toolsUsed = []) {
 // Load evidence from server
 async function loadEvidence() {
     try {
-        const response = await fetch(`http://localhost:8000/evidence/${userId}`);
+        const response = await fetch(`${API_URL}/evidence/${userId}`);
         const data = await response.json();
         
         if (data.evidence && data.evidence.length > 0) {
@@ -211,14 +213,40 @@ function updatePhaseUI() {
 // New journey
 newJourneyBtn.addEventListener('click', async () => {
     if (confirm('Start a new journey? This will clear your conversation history.')) {
-       try {
-    const API_URL = 'https://human-success-backend-1.onrender.com';
-    await fetch(`${API_URL}/user/${userId}`, {
-        method: 'DELETE'
-    });
-} catch (error) {
-    console.error('Error clearing user data:', error);
-}
+        try {
+            await fetch(`${API_URL}/user/${userId}`, {
+                method: 'DELETE'
+            });
+        } catch (error) {
+            console.error('Error clearing user data:', error);
+        }
+        
+        // Reset local state
+        userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        sessionId = generateSessionId();
+        messageCount = 0;
+        phase = 'safety';
+        
+        localStorage.setItem('human_success_user_id', userId);
+        localStorage.setItem('human_success_session_id', sessionId);
+        localStorage.setItem('message_count', '0');
+        localStorage.setItem('current_phase', 'safety');
+        
+        // Clear UI
+        chatMessages.innerHTML = `
+            <div class="message guide">
+                <div class="message-content">
+                    <p>Welcome. I'm here to help you understand how you were designed—spiritually, neurologically, and biologically.</p>
+                    <p>Before we go anywhere, let's start here: How are you right now, in this moment? Not how you think you should be. How you actually are.</p>
+                    <p class="message-footnote">Take your time. There's no rush.</p>
+                </div>
+            </div>
+        `;
+        
+        evidenceList.innerHTML = '<p class="empty-evidence">Your evidence will appear here</p>';
+        updatePhaseUI();
+    }
+});
         
         // Reset local state
         userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -255,7 +283,7 @@ function generateSessionId() {
 // Load journey on startup
 async function loadJourney() {
     try {
-        const response = await fetch(`http://localhost:8000/journey/${userId}`);
+        const response = await fetch(`${API_URL}/journey/${userId}`);
         const data = await response.json();
         
         messageCount = data.message_count || 0;
