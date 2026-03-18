@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
+from fastapi.middleware.cors import CORSMiddleware
 import uuid
 import uvicorn
 from agent import HumanSuccessAgent
@@ -12,7 +13,14 @@ app = FastAPI(
     description="Guiding people through their spiritual, neurological, and biological design",
     version="1.0.0"
 )
-
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://human-success-frontend-1.onrender.com"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # CORS
 app.add_middleware(
     CORSMiddleware,
