@@ -4,8 +4,6 @@ let sessionId = localStorage.getItem('human_success_session_id') || generateSess
 let messageCount = parseInt(localStorage.getItem('message_count') || '0');
 let phase = localStorage.getItem('current_phase') || 'safety';
 let isProcessing = false;
-// API URL - CHANGE THIS TO YOUR BACKEND URL
-const API_URL = 'https://human-success-backend-1.onrender.com';
 
 // Generate IDs if needed
 if (!userId) {
@@ -67,14 +65,11 @@ async function sendMessage() {
     const message = userInput.value.trim();
     if (!message || isProcessing) return;
     
-    // Clear input
     userInput.value = '';
     userInput.style.height = 'auto';
     
-    // Add user message to UI
     addMessageToChat('user', message);
     
-    // Show typing indicator
     isProcessing = true;
     sendButton.disabled = true;
     typingIndicator.style.display = 'flex';
@@ -94,7 +89,6 @@ async function sendMessage() {
         
         const data = await response.json();
         
-        // Hide typing indicator
         typingIndicator.style.display = 'none';
         
         if (data.error) {
@@ -104,12 +98,10 @@ async function sendMessage() {
             messageCount++;
             localStorage.setItem('message_count', messageCount.toString());
             
-            // Update phase based on message count
             updatePhaseFromCount();
             
-            // Check if this response might have recorded evidence
             if (data.tools_used && data.tools_used.includes('record_evidence')) {
-                loadEvidence(); // Refresh evidence list
+                loadEvidence();
             }
         }
         
@@ -136,7 +128,6 @@ function addMessageToChat(role, content, toolsUsed = []) {
         ).join('');
     }
     
-    // Format content with paragraphs
     const paragraphs = content.split('\n').filter(p => p.trim()).map(p => `<p>${p}</p>`).join('');
     
     messageDiv.innerHTML = `
@@ -153,7 +144,7 @@ function addMessageToChat(role, content, toolsUsed = []) {
 // Load evidence from server
 async function loadEvidence() {
     try {
-       const response = await fetch('https://human-success-backend-1.onrender.com/evidence/' + userId);
+        const response = await fetch('https://human-success-backend-1.onrender.com/evidence/' + userId);
         const data = await response.json();
         
         if (data.evidence && data.evidence.length > 0) {
@@ -191,12 +182,10 @@ function updatePhaseFromCount() {
 
 // Update phase indicators
 function updatePhaseUI() {
-    // Remove active class from all
     phaseSafety.classList.remove('active');
     phaseImagination.classList.remove('active');
     phaseMechanism.classList.remove('active');
     
-    // Add active class to current phase
     if (phase === 'safety') {
         phaseSafety.classList.add('active');
     } else if (phase === 'imagination') {
@@ -205,7 +194,6 @@ function updatePhaseUI() {
         phaseMechanism.classList.add('active');
     }
     
-    // Update day counter
     const day = Math.min(Math.floor(messageCount / 2) + 1, 21);
     dayCounter.textContent = `Day ${day} of 21`;
 }
@@ -214,14 +202,13 @@ function updatePhaseUI() {
 newJourneyBtn.addEventListener('click', async () => {
     if (confirm('Start a new journey? This will clear your conversation history.')) {
         try {
-            await fetch(`${API_URL}/user/${userId}`, {
+            await fetch('https://human-success-backend-1.onrender.com/user/' + userId, {
                 method: 'DELETE'
             });
         } catch (error) {
             console.error('Error clearing user data:', error);
         }
         
-        // Reset local state
         userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         sessionId = generateSessionId();
         messageCount = 0;
@@ -232,7 +219,6 @@ newJourneyBtn.addEventListener('click', async () => {
         localStorage.setItem('message_count', '0');
         localStorage.setItem('current_phase', 'safety');
         
-        // Clear UI
         chatMessages.innerHTML = `
             <div class="message guide">
                 <div class="message-content">
@@ -247,9 +233,6 @@ newJourneyBtn.addEventListener('click', async () => {
         updatePhaseUI();
     }
 });
-        
-      
-    
 
 // Generate session ID
 function generateSessionId() {
@@ -259,7 +242,7 @@ function generateSessionId() {
 // Load journey on startup
 async function loadJourney() {
     try {
-       const response = await fetch('https://human-success-backend-1.onrender.com/journey/' + userId);
+        const response = await fetch('https://human-success-backend-1.onrender.com/journey/' + userId);
         const data = await response.json();
         
         messageCount = data.message_count || 0;
