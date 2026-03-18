@@ -248,30 +248,7 @@ newJourneyBtn.addEventListener('click', async () => {
     }
 });
         
-        // Reset local state
-        userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        sessionId = generateSessionId();
-        messageCount = 0;
-        phase = 'safety';
-        
-        localStorage.setItem('human_success_user_id', userId);
-        localStorage.setItem('human_success_session_id', sessionId);
-        localStorage.setItem('message_count', '0');
-        localStorage.setItem('current_phase', 'safety');
-        
-        // Clear UI
-        chatMessages.innerHTML = `
-            <div class="message guide">
-                <div class="message-content">
-                    <p>Welcome. I'm here to help you understand how you were designed—spiritually, neurologically, and biologically.</p>
-                    <p>Before we go anywhere, let's start here: How are you right now, in this moment? Not how you think you should be. How you actually are.</p>
-                    <p class="message-footnote">Take your time. There's no rush.</p>
-                </div>
-            </div>
-        `;
-        
-        evidenceList.innerHTML = '<p class="empty-evidence">Your evidence will appear here</p>';
-        updatePhaseUI();
+      
     
 
 // Generate session ID
