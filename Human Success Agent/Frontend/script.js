@@ -80,7 +80,7 @@ async function sendMessage() {
     typingIndicator.style.display = 'flex';
     
     try {
-        const response = await fetch(`${API_URL}/chat`, {
+        const response = await fetch('https://human-success-backend-1.onrender.com/chat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -153,7 +153,7 @@ function addMessageToChat(role, content, toolsUsed = []) {
 // Load evidence from server
 async function loadEvidence() {
     try {
-        const response = await fetch(`${API_URL}/evidence/${userId}`);
+       const response = await fetch('https://human-success-backend-1.onrender.com/evidence/' + userId);
         const data = await response.json();
         
         if (data.evidence && data.evidence.length > 0) {
@@ -259,7 +259,7 @@ function generateSessionId() {
 // Load journey on startup
 async function loadJourney() {
     try {
-        const response = await fetch(`${API_URL}/journey/${userId}`);
+       const response = await fetch('https://human-success-backend-1.onrender.com/journey/' + userId);
         const data = await response.json();
         
         messageCount = data.message_count || 0;
