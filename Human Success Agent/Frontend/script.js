@@ -15,7 +15,8 @@ localStorage.setItem('human_success_session_id', sessionId);
 // DOM elements
 const chatMessages = document.getElementById('chat-messages');
 const userInput = document.getElementById('user-input');
-const sendButton = document.getElementById('send-button');sendButton.onclick = sendMessage;
+const sendButton = document.getElementById('send-button');
+sendButton.onclick = sendMessage;
 const typingIndicator = document.getElementById('typing-indicator');
 const evidenceList = document.getElementById('evidence-list');
 const menuToggle = document.getElementById('menu-toggle');
