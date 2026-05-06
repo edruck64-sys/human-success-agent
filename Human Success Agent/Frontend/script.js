@@ -27,7 +27,7 @@ const phaseSafety = document.getElementById('phase-safety');
 const phaseImagination = document.getElementById('phase-imagination');
 const phaseMechanism = document.getElementById('phase-mechanism');
 const dayCounter = document.getElementById('day-counter');
-sendButton.onclick = sendMessage
+
 // Initialize
 updatePhaseUI();
 loadEvidence();
