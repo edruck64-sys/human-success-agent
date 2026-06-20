@@ -1,10 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
-from fastapi.middleware.cors import CORSMiddleware
 import uuid
+import os
 import uvicorn
 from agent import HumanSuccessAgent
 
@@ -14,12 +13,11 @@ app = FastAPI(
     version="1.0.0"
 )
 
-)
 # CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -27,11 +25,10 @@ app.add_middleware(
 # Initialize agent
 agent = HumanSuccessAgent()
 
-# Models
 class ChatRequest(BaseModel):
     message: str
     user_id: Optional[str] = None
-    session_id: Optional[str] = None  # For backward compatibility
+    session_id: Optional[str] = None
 
 class ChatResponse(BaseModel):
     response: str
@@ -55,7 +52,6 @@ class HealthResponse(BaseModel):
     agent: str
     message: str
 
-# Routes
 @app.get("/", response_model=HealthResponse)
 async def root():
     return HealthResponse(
@@ -66,13 +62,9 @@ async def root():
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
-    """Send a message to the Human Success Guide"""
-    # Use user_id if provided, otherwise use session_id, otherwise generate new
     user_id = request.user_id or request.session_id or str(uuid.uuid4())
-    
     try:
         result = agent.process_message(request.message, user_id)
-        
         if result["success"]:
             return ChatResponse(
                 response=result["response"],
@@ -85,13 +77,11 @@ async def chat(request: ChatRequest):
                 user_id=user_id,
                 error=result.get("error", "Unknown error")
             )
-            
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/journey/{user_id}", response_model=JourneyResponse)
 async def get_journey(user_id: str):
-    """Get a user's current journey status"""
     try:
         journey = agent.get_user_journey(user_id)
         return JourneyResponse(**journey)
@@ -100,19 +90,14 @@ async def get_journey(user_id: str):
 
 @app.get("/evidence/{user_id}", response_model=EvidenceResponse)
 async def get_evidence(user_id: str):
-    """Get evidence collected for a user"""
     try:
         evidence = agent._get_user_evidence(user_id)
-        return EvidenceResponse(
-            evidence=evidence,
-            count=len(evidence)
-        )
+        return EvidenceResponse(evidence=evidence, count=len(evidence))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/user/{user_id}")
 async def clear_user(user_id: str):
-    """Clear all data for a user"""
     try:
         agent.clear_user_data(user_id)
         return {"status": "cleared", "user_id": user_id}
@@ -120,4 +105,5 @@ async def clear_user(user_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
