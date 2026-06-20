@@ -327,7 +327,7 @@ Now guide with that authority."""
         }
         
         payload = {
-            "model": "deepseek-reasoner",  # Using reasoning model for depth
+           "model": "deepseek-chat",  # supports the agent's tools
             "messages": messages,
             "tools": self.tools,
             "tool_choice": "auto",
