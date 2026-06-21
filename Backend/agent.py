@@ -329,8 +329,7 @@ Your deepest aim: help people see that how they were designed is not a mystery â
         
         payload = {
            "model": "deepseek-chat",  # supports the agent's tools
-            "messages": messages,
-            "tools": self.tools,
+
             "tool_choice": "auto",
             "temperature": 0.7,
             "max_tokens": 2000
