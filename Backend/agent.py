@@ -48,7 +48,7 @@ class HumanSuccessAgent:
         
         print("âœ… Human Success Agent initialized")
     
- def _load_system_prompt(self) -> str:
+    def _load_system_prompt(self) -> str:
         """The agent's core identity and teaching approach"""
         return """You are the Human Success Agent, created by Ed Rucker for the Human Success Institute.
 
@@ -298,126 +298,79 @@ Your deepest aim: help people see that how they were designed is not a mystery â
     
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
     def process_message(self, message: str, user_id: str = "default") -> Dict[str, Any]:
-        """
-        Process a user message through the Human Success Guide
-        """
-        # Get user's history and evidence
+        """Process a user message, running tools in a loop until a final answer."""
         history = self._get_user_history(user_id)
         evidence = self._get_user_evidence(user_id)
-        
-        # Build context
+
         evidence_summary = ""
         if evidence:
-            recent = evidence[-3:]  # Last 3 pieces of evidence
-            evidence_summary = "\nUser's evidence of change:\n" + "\n".join([
-                f"- {e['evidence']} ({e['category']}, {e['timestamp'][:10]})"
-                for e in recent
-            ])
-        
-        # Prepare messages
+            lines = ["", "User's evidence of change:"]
+            for e in evidence[-3:]:
+                lines.append(f"- {e['evidence']} ({e['category']}, {e['timestamp'][:10]})")
+            evidence_summary = chr(10).join(lines)
+
         messages = [
             {"role": "system", "content": self.system_prompt + evidence_summary},
-            *history[-10:],  # Last 10 messages for context
+            *history[-10:],
             {"role": "user", "content": message}
         ]
-        
-        # Prepare API request
+
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
-        
-        payload = {
-           "model": "deepseek-chat",  # supports the agent's tools
 
-            "tool_choice": "auto",
-            "temperature": 0.7,
-            "max_tokens": 2000
-        }
-        
+        tools_used = []
+
         try:
-            # Make API call
-            response = requests.post(
-                self.api_url,
-                headers=headers,
-                json=payload,
-                timeout=30
-            )
-            response.raise_for_status()
-            result = response.json()
-            
-            # Get assistant message
-            assistant_message = result["choices"][0]["message"]
-            
-            # Handle tool calls
-            if "tool_calls" in assistant_message and assistant_message["tool_calls"]:
-                # Add assistant message to history
-                messages.append(assistant_message)
-                
-                # Execute tools
-                tool_responses = []
-                for tool_call in assistant_message["tool_calls"]:
-                    tool_result = self._execute_tool(tool_call, user_id)
-                    tool_responses.append({
-                        "tool_call_id": tool_call["id"],
-                        "result": tool_result
-                    })
-                    messages.append({
-                        "role": "tool",
-                        "tool_call_id": tool_call["id"],
-                        "content": tool_result
-                    })
-                
-                # Get final response with tool results
-                final_response = requests.post(
-                    self.api_url,
-                    headers=headers,
-                    json={**payload, "messages": messages},
-                    timeout=30
-                )
-                final_result = final_response.json()
-                final_message = final_result["choices"][0]["message"]["content"]
-                
-                # Save to history
+            for _ in range(5):
+                payload = {
+                    "model": "deepseek-chat",
+                    "messages": messages,
+                    "tools": self.tools,
+                    "tool_choice": "auto",
+                    "temperature": 0.7,
+                    "max_tokens": 2000
+                }
+                response = requests.post(self.api_url, headers=headers, json=payload, timeout=60)
+                response.raise_for_status()
+                assistant_message = response.json()["choices"][0]["message"]
+
+                tool_calls = assistant_message.get("tool_calls")
+                if tool_calls:
+                    messages.append(assistant_message)
+                    for tool_call in tool_calls:
+                        tools_used.append(tool_call["function"]["name"])
+                        tool_result = self._execute_tool(tool_call, user_id)
+                        messages.append({
+                            "role": "tool",
+                            "tool_call_id": tool_call["id"],
+                            "content": tool_result
+                        })
+                    continue
+
+                final_message = assistant_message.get("content") or ""
                 history.append({"role": "user", "content": message})
                 history.append({"role": "assistant", "content": final_message})
                 self._save_user_history(user_id, history)
-                
                 return {
                     "success": True,
                     "response": final_message,
-                    "tools_used": [tc["function"]["name"] for tc in assistant_message["tool_calls"]],
+                    "tools_used": tools_used,
                     "user_id": user_id
                 }
-            
-            # No tools, just return response
-            final_message = assistant_message["content"]
-            
-            # Save to history
-            history.append({"role": "user", "content": message})
-            history.append({"role": "assistant", "content": final_message})
-            self._save_user_history(user_id, history)
-            
+
             return {
                 "success": True,
-                "response": final_message,
-                "tools_used": [],
+                "response": "Let's slow down for a moment. What feels most present for you right now?",
+                "tools_used": tools_used,
                 "user_id": user_id
             }
-            
+
         except requests.exceptions.RequestException as e:
-            return {
-                "success": False,
-                "error": f"Connection error: {str(e)}",
-                "user_id": user_id
-            }
+            return {"success": False, "error": f"Connection error: {str(e)}", "user_id": user_id}
         except Exception as e:
-            return {
-                "success": False,
-                "error": f"Unexpected error: {str(e)}",
-                "user_id": user_id
-            }
-    
+            return {"success": False, "error": f"Unexpected error: {str(e)}", "user_id": user_id}
     def get_user_journey(self, user_id: str) -> Dict:
         """Get the user's current journey status"""
         history = self._get_user_history(user_id)
