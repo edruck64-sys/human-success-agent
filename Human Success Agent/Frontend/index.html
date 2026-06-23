@@ -3,19 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Human Success Guide</title>
+    <title>Architect &mdash; Human Success Institute</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="app">
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h2>Human Success</h2>
+                <div class="brand">
+                    <span class="brand-mark" aria-hidden="true">
+                        <img src="compass.png" alt="">
+                    </span>
+                    <h2>Human Success</h2>
+                </div>
                 <p class="sidebar-tagline">Understanding how you were created and why</p>
             </div>
-            
+
             <div class="journey-section">
                 <h3>Your Journey</h3>
                 <div class="phase-indicator">
@@ -25,7 +34,7 @@
                     </div>
                     <div class="phase" id="phase-imagination">
                         <span class="phase-dot"></span>
-                        <span>Imagination</span>
+                        <span>Vision</span>
                     </div>
                     <div class="phase" id="phase-mechanism">
                         <span class="phase-dot"></span>
@@ -34,57 +43,78 @@
                 </div>
                 <div class="day-counter" id="day-counter">Day 1 of 21</div>
             </div>
-            
+
             <div class="evidence-section">
                 <h3>Your Evidence</h3>
                 <div id="evidence-list" class="evidence-list">
                     <p class="empty-evidence">Your evidence will appear here</p>
                 </div>
             </div>
-            
+
             <div class="sidebar-footer">
                 <button class="new-journey-btn" id="new-journey">New Journey</button>
                 <p class="institute">Human Success Institute</p>
             </div>
         </div>
-        
+
         <!-- Main Chat Area -->
         <div class="main">
             <div class="chat-header">
-                <button class="menu-toggle" id="menu-toggle">☰</button>
+                <button class="menu-toggle" id="menu-toggle" aria-label="Menu">&#9776;</button>
                 <div class="header-content">
-                    <h1>The Human Success Agent</h1>
-                    <p class="header-scripture">"As a man thinks in his heart, so he is" — Proverbs 23:7</p>
+                    <div class="agent-title">
+                        <span class="agent-glyph" aria-hidden="true"><img src="compass.png" alt=""></span>
+                        <h1>Architect</h1>
+                    </div>
+                    <p class="header-scripture">&ldquo;As a man thinks in his heart, so he is&rdquo; &mdash; Proverbs 23:7</p>
                 </div>
             </div>
-            
+
             <div class="chat-messages" id="chat-messages">
                 <div class="message guide">
                     <div class="message-content">
-                        <p>Welcome. I'm here to help you understand how you were designed—spiritually, neurologically, and biologically.</p>
-                        <p>Before we go anywhere, let's start here: How are you right now, in this moment? Not how you think you should be. How you actually are.</p>
-                        <p class="message-footnote">Take your time. There's no rush.</p>
+                        <p>Welcome. I&rsquo;m here to help you understand how you were designed&mdash;spiritually, neurologically, and biologically.</p>
+                        <p>Before we go anywhere, let&rsquo;s start here: How are you right now, in this moment? Not how you think you should be. How you actually are.</p>
+                        <p class="message-footnote">Take your time. There&rsquo;s no rush.</p>
                     </div>
                 </div>
             </div>
-            
-            <div class="chat-input-container">
-                <textarea 
-                    id="user-input" 
-                    placeholder="Type your message..." 
-                    rows="1"
-                ></textarea>
-                <button id="send-button">Send</button>
-            </div>
-            
+
             <div class="typing-indicator" id="typing-indicator">
-                <span></span>
-                <span></span>
-                <span></span>
+                <img class="loader-compass" src="compass.png" alt="">
+                <span class="think-text">Architect is thinking&hellip;</span>
+            </div>
+
+            <div class="chat-input-container">
+                <div class="input-wrap">
+                    <textarea
+                        id="user-input"
+                        placeholder="Type your message&hellip;"
+                        rows="1"
+                    ></textarea>
+                    <div class="input-actions">
+                        <button id="mic-button" class="icon-btn mic" title="Speak your message" aria-label="Speak your message">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="3" width="6" height="11" rx="3"/>
+                                <path d="M5 11a7 7 0 0 0 14 0"/>
+                                <line x1="12" y1="18" x2="12" y2="21"/>
+                                <line x1="8.5" y1="21" x2="15.5" y2="21"/>
+                            </svg>
+                        </button>
+                        <button id="send-button" class="icon-btn send" title="Send" aria-label="Send">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="19" x2="12" y2="5"/>
+                                <polyline points="6 11 12 5 18 11"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <p class="input-hint">Architect offers education and insight, not medical or mental-health treatment.</p>
             </div>
         </div>
     </div>
-    
+
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
